@@ -13,9 +13,9 @@ This document serves as a long-form, comprehensive reference for building, orche
 
 **When starting a new session or tasks involving ADK:**
 1.  **Ask Permission**: "Shall I check for updates to the ADK references from the official global cache?"
-2.  **Execute Update**: If the user agrees, run:
+2.  **Execute Update**: If the user agrees, run the following command from the skill's root directory:
     ```bash
-    python3 ~/.gemini/jetski/skills/adk_developer/scripts/update_skill.py
+    python3 scripts/update_skill.py
     ```
 3.  **Confirm**: Report the update status before proceeding.
 
@@ -28,6 +28,7 @@ This document serves as a long-form, comprehensive reference for building, orche
 > 5.  **Simplicity First**: **ALWAYS** start with a single `LlmAgent`. Only introduce Workflow/Multi-Agent architectures if the task complexity specifically demands it (e.g., rigid determinism, context limits). Do not over-engineer.
 > 6.  **Process Boundaries**: When asked to **Design**, produce the design artifact and **STOP**. Do not implement code until explicitly requested.
 > 7.  **Configuration Protocol**: **NEVER** assume values for `GOOGLE_CLOUD_PROJECT`, `GOOGLE_CLOUD_LOCATION`, or other secrets. **ALWAYS** ask the user for these values before creating configuration files.
+> 8.  **Comprehensive Mock Data**: When providing mock data in tools or examples, always include at least **ten** varied and realistic entries per category to ensure comprehensive testing and demonstration.
 
 ## Table of Contents
 
@@ -741,3 +742,27 @@ Real-world insights from deploying ADK agents.
 **Context**: Running `adk web` to test a newly developed agent via the browser UI.
 **Problem**: Running `adk web` from *inside* the specific agent's folder or running `adk web [agent_name]` can cause pathing issues, naming collisions, or prevent the app launcher from loading the agent correctly.
 **Solution**: Always run `adk web --port 8080` from the **parent workspace directory** (the root folder containing all agent subfolders) without specifying the agent name. This allows the ADK dev server to discover all agents, present the app selector UI properly, and maintain session isolation.
+
+### 19.9 Vertex AI Env Var Failure (JSONDecodeError)
+**Context**: Running agents in environments where `google-genai` fails to automatically pick up `GOOGLE_CLOUD_PROJECT` or `GOOGLE_CLOUD_LOCATION` despite them being set.
+*   **Problem**: The model call fails with a `json.decoder.JSONDecodeError`. This is often a red herring caused by the Vertex AI API returning a 404 HTML page (because the project/location became `None` in the request URL) instead of a JSON error.
+*   **Symptom**: `json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)` in the stack trace.
+*   **Solution**: **Explicitly patch the genai Client** in your `agent.py` to ensure it always uses the environment variables if they are available.
+*   **Implementation**:
+    ```python
+    import os
+    from google import genai
+    
+    # Workaround for environment-specific variable pickup issues
+    original_client_init = genai.Client.__init__
+    def patched_client_init(self, *args, **kwargs):
+        use_vertex = kwargs.get('vertexai') or os.environ.get('GOOGLE_GENAI_USE_VERTEXAI') == 'True'
+        if use_vertex:
+            if not kwargs.get('project'):
+                kwargs['project'] = os.environ.get('GOOGLE_CLOUD_PROJECT')
+            if not kwargs.get('location'):
+                kwargs['location'] = os.environ.get('GOOGLE_CLOUD_LOCATION')
+            kwargs['vertexai'] = True
+        original_client_init(self, *args, **kwargs)
+    genai.Client.__init__ = patched_client_init
+    ```

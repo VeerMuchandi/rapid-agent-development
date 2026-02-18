@@ -12,9 +12,9 @@ This skill equips you with the knowledge and best practices to design, implement
 
 **When starting a new session or tasks involving A2UI:**
 1.  **Ask Permission**: "Shall I check for updates to the A2UI references from the official global cache?"
-2.  **Execute Update**: If the user agrees, run:
+2.  **Execute Update**: If the user agrees, run the following command from the skill's root directory:
     ```bash
-    python3 ~/.gemini/jetski/skills/a2ui_developer/scripts/update_skill.py
+    python3 scripts/update_skill.py
     ```
 3.  **Confirm**: Report the update status before proceeding.
 
