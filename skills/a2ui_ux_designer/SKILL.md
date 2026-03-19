@@ -16,7 +16,7 @@ This skill equips you to act as an expert UX Designer for Agent-Driven User Inte
 1.  **Ask Permission**: "Shall I check for updates to the A2UI component gallery and specifications from the official global cache?"
 2.  **Execute Update**: If the user agrees, run the update script:
     ```bash
-    python3 ~/.gemini/jetski/skills/a2ui_ux_designer/scripts/update_skill.py
+    python3 scripts/update_skill.py
     ```
 3.  **Confirm**: Report the update status before proceeding with the design task.
 

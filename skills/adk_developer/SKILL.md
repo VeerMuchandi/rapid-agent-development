@@ -15,7 +15,7 @@ This document serves as a long-form, comprehensive reference for building, orche
 1.  **Ask Permission**: "Shall I check for updates to the ADK references from the official global cache?"
 2.  **Execute Update**: If the user agrees, run:
     ```bash
-    python3 ~/.gemini/jetski/skills/adk_developer/scripts/update_skill.py
+    python3 scripts/update_skill.py
     ```
 3.  **Confirm**: Report the update status before proceeding.
 

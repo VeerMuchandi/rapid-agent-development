@@ -71,8 +71,8 @@ google-cloud-aiplatform[agent_engines,adk]
 Instead of manually creating files, run the provided helper script. It will intelligently scan your agent directory and generate/update `.ae_ignore`, `requirements.txt`, and `.env` with the correct configurations.
 
 ```bash
-# Run the preparation script pointing to your agent directory
-python3 ~/.gemini/jetski/skills/agent_engine_terraform_deployer/scripts/prepare_agent.py .
+# Run the preparation script pointing to your agent directory (replace /path/to/your/agent)
+python3 scripts/prepare_agent.py /path/to/your/agent
 ```
 
 This script will:
